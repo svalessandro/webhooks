@@ -33,7 +33,7 @@ router.get('/callback', async (req, res) => {
       }
     );
 
-    const { access_token, refresh_token, expires_in } = response.data;
+    const { access_token } = response.data;
 
     console.log('🔐 Token de acesso recebido:', access_token);
     accessTokenEmMemoria = access_token;
