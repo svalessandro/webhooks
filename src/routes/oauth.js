@@ -39,8 +39,8 @@ router.get('/callback', async (req, res) => {
     accessTokenEmMemoria = access_token;
 
     // ✅ Cadastrar Webhooks automaticamente
-    await cadastrarWebhook(accessTokenEmMemoria, 'pedido.criado', 'https://webhooks-production-7dbf.up.railway.app/webhook');
-    await cadastrarWebhook(accessTokenEmMemoria, 'pedido.atualizado', 'https://webhooks-production-7dbf.up.railway.app/webhook');
+    await cadastrarWebhook(accessTokenEmMemoria, 'order.created', 'https://webhooks-production-7dbf.up.railway.app/webhook');
+    await cadastrarWebhook(accessTokenEmMemoria, 'order.updated', 'https://webhooks-production-7dbf.up.railway.app/webhook');
 
     res.send('Autorizado com sucesso! Token armazenado em memória e webhooks cadastrados.');
 
