@@ -1,6 +1,8 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
+const { salvarTokens } = require('../services/tokenStorage');
+
 
 router.get('/callback', async (req, res) => {
   const { code } = req.query;
@@ -30,10 +32,19 @@ router.get('/callback', async (req, res) => {
       }
     );
 
-    const { access_token } = response.data;
+    const { access_token, refresh_token, expires_in } = response.data;
 
-    console.log('🔐 Token de acesso recebido:', access_token);
-    res.send('Autorizado com sucesso! Token gerado. Veja logs do servidor.');
+console.log('🔐 Token de acesso recebido:', access_token);
+
+// 💾 Salvar os tokens
+salvarTokens({
+  access_token,
+  refresh_token,
+  expires_in,
+  obtained_at: new Date().toISOString()
+});
+
+res.send('Autorizado com sucesso! Token gerado e salvo em tokens.json.');
 
   } catch (error) {
     console.error('❌ Erro ao trocar código por token:', {
