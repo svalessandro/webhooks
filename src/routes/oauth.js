@@ -1,8 +1,9 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
-const { salvarTokens } = require('../services/tokenStorage');
+const { cadastrarWebhook } = require('../services/cadastrarWebhook');
 
+let accessTokenEmMemoria = null;
 
 router.get('/callback', async (req, res) => {
   const { code } = req.query;
@@ -34,17 +35,14 @@ router.get('/callback', async (req, res) => {
 
     const { access_token, refresh_token, expires_in } = response.data;
 
-console.log('🔐 Token de acesso recebido:', access_token);
+    console.log('🔐 Token de acesso recebido:', access_token);
+    accessTokenEmMemoria = access_token;
 
-// 💾 Salvar os tokens
-salvarTokens({
-  access_token,
-  refresh_token,
-  expires_in,
-  obtained_at: new Date().toISOString()
-});
+    // ✅ Cadastrar Webhooks automaticamente
+    await cadastrarWebhook(accessTokenEmMemoria, 'pedido.criado', 'https://webhooks-production-7dbf.up.railway.app/webhook');
+    await cadastrarWebhook(accessTokenEmMemoria, 'pedido.atualizado', 'https://webhooks-production-7dbf.up.railway.app/webhook');
 
-res.send('Autorizado com sucesso! Token gerado e salvo em tokens.json.');
+    res.send('Autorizado com sucesso! Token armazenado em memória e webhooks cadastrados.');
 
   } catch (error) {
     console.error('❌ Erro ao trocar código por token:', {
