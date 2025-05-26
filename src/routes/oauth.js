@@ -13,7 +13,7 @@ router.get('/callback', async (req, res) => {
     const response = await axios.post('https://www.bling.com.br/Api/v3/oauth/token', {
       grant_type: 'authorization_code',
       code,
-      redirect_uri: 'https://bling-foody-webhooks-production.up.railway.app/oauth/callback',
+      redirect_uri: 'https://webhooks-production-7dbf.up.railway.app/oauth/callback',
       client_id: process.env.BLING_CLIENT_ID,
       client_secret: process.env.BLING_CLIENT_SECRET,
     });
