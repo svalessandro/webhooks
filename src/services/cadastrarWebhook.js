@@ -6,6 +6,7 @@ async function cadastrarWebhook(accessToken, evento, url) {
       'https://www.bling.com.br/Api/v3/webhooks',
       {
         event: evento,
+        entity: 'pedido',
         url: url
       },
       {
