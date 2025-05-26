@@ -1,5 +1,4 @@
-// src/routes/webhook.js
-import express from 'express';
+const express = require('express');
 const router = express.Router();
 
 router.post('/bling', (req, res) => {
@@ -9,4 +8,4 @@ router.post('/bling', (req, res) => {
   res.status(200).send('OK');
 });
 
-export default router;
+module.exports = router;
