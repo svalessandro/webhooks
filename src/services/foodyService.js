@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const FOODY_URL = process.env.FOODY_OPEN_DELIVERY_URL; // já é https://app.foodydelivery.com/opendelivery/api
+const FOODY_URL = process.env.FOODY_OPEN_DELIVERY_URL;
 const FOODY_CLIENT_ID = process.env.FOODY_CLIENT_ID;
 const FOODY_CLIENT_SECRET = process.env.FOODY_CLIENT_SECRET;
 
