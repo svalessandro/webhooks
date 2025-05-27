@@ -1,15 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
 require('dotenv').config();
+console.log('✅ FOODY_URL:', process.env.FOODY_OPEN_DELIVERY_URL);
 
-const blingWebhook = require('./routes/blingWebhook');
-const foodyWebhook = require('./routes/foodyWebhook');
-
+const express = require('express');
 const app = express();
-app.use(bodyParser.json());
+const blingWebhook = require('./routes/blingWebhook');
 
+app.use(express.json());
 app.use('/webhook/bling', blingWebhook);
-app.use('/webhook/foody', foodyWebhook);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
