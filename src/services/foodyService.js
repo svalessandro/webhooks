@@ -11,16 +11,17 @@ async function enviarPedidoFoody(pedidoBling) {
 
   try {
     const response = await axios.post(
-      `${FOODY_URL}/logistics/orders`,
-      payload,
-      {
-        headers: {
-          'client-id': FOODY_CLIENT_ID,
-          'client-secret': FOODY_CLIENT_SECRET,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+  `${FOODY_URL}/logistics/delivery`,  // ✅ CORRETO
+  payload,
+  {
+    headers: {
+      'client-id': FOODY_CLIENT_ID,
+      'client-secret': FOODY_CLIENT_SECRET,
+      'Content-Type': 'application/json'
+    }
+  }
+);
+
 
     console.log('✅ Pedido enviado com sucesso:', response.data);
   } catch (error) {
