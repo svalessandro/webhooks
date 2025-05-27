@@ -9,7 +9,7 @@ async function enviarPedidoFoody(pedido, foodyToken) {
       pedido,
       {
         headers: {
-          'Authorization': foodyToken,
+          'Authorization': `Bearer ${foodyToken}`,
           'Content-Type': 'application/json;charset=UTF-8'
         }
       }
