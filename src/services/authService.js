@@ -1,27 +1,27 @@
 const axios = require('axios');
 
-const FOODY_URL = process.env.FOODY_OPEN_DELIVERY_URL;
 const FOODY_CLIENT_ID = process.env.FOODY_CLIENT_ID;
 const FOODY_CLIENT_SECRET = process.env.FOODY_CLIENT_SECRET;
+const FOODY_TOKEN_URL = process.env.FOODY_TOKEN_URL;
 
-let cachedToken = null;
-let tokenExpiration = null;
+let accessToken = null;
+let tokenExpiresAt = null;
 
 async function getAccessToken() {
-  const now = Math.floor(Date.now() / 1000);
+  const now = Date.now();
 
-  if (cachedToken && tokenExpiration && now < tokenExpiration) {
-    return cachedToken;
+  if (accessToken && tokenExpiresAt && now < tokenExpiresAt) {
+    return accessToken;
   }
 
   try {
     const response = await axios.post(
-      `${FOODY_URL}/oauth/token`,
+      FOODY_TOKEN_URL,
       new URLSearchParams({
+        grant_type: 'client_credentials',
         client_id: FOODY_CLIENT_ID,
-        client_secret: FOODY_CLIENT_SECRET,
-        grant_type: 'client_credentials'
-      }).toString(),
+        client_secret: FOODY_CLIENT_SECRET
+      }),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -29,14 +29,13 @@ async function getAccessToken() {
       }
     );
 
-    const { access_token, expires_in } = response.data;
+    accessToken = response.data.access_token;
+    const expiresIn = response.data.expires_in; // segundos
+    tokenExpiresAt = now + expiresIn * 1000;
 
-    cachedToken = access_token;
-    tokenExpiration = now + expires_in - 60; // buffer de 1 min
+    console.log('✅ Novo token obtido com sucesso.');
+    return accessToken;
 
-    console.log('✅ Novo token obtido com sucesso');
-
-    return access_token;
   } catch (error) {
     console.error('❌ Erro ao obter token:', error.response?.data || error.message);
     throw new Error('Falha ao obter token de autenticação');
