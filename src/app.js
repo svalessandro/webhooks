@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
-const blingWebhook = require('./routes/blingwebhook');
+const blingWebhook = require('./routes/blingWebhook');
 const foodyWebhook = require('./routes/foodyWebhook');
 
 const app = express();
