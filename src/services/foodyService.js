@@ -9,19 +9,28 @@ async function enviarPedidoFoody(pedidoBling) {
 
   console.log('🚀 Enviando pedido para Foody Open Delivery:', payload);
 
-  const response = await axios.post(
-    `${FOODY_URL}/v1/orders`,
-    payload,
-    {
-      headers: {
-        'client-id': FOODY_CLIENT_ID,
-        'client-secret': FOODY_CLIENT_SECRET,
-        'Content-Type': 'application/json'
+  try {
+    const response = await axios.post(
+      `${FOODY_URL}/logistics/orders`,
+      payload,
+      {
+        headers: {
+          'client-id': FOODY_CLIENT_ID,
+          'client-secret': FOODY_CLIENT_SECRET,
+          'Content-Type': 'application/json'
+        }
       }
-    }
-  );
+    );
 
-  console.log('✅ Pedido enviado com sucesso:', response.data);
+    console.log('✅ Pedido enviado com sucesso:', response.data);
+  } catch (error) {
+    console.error('❌ Erro ao processar pedido:', {
+      message: error.message,
+      data: error.response?.data,
+      status: error.response?.status,
+      path: error.config?.url
+    });
+  }
 }
 
 function transformarPedidoParaOpenDelivery(pedidoBling) {
