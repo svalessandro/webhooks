@@ -2,6 +2,8 @@ const axios = require('axios');
 
 async function enviarPedidoFoody(pedido, foodyToken) {
   try {
+    console.log('🛡️ Token usado:', foodyToken);
+
     const response = await axios.post(
       'https://app.foodydelivery.com/rest/1.2/orders',
       pedido,

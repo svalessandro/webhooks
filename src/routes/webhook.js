@@ -31,11 +31,11 @@ function transformarPedidoBlingParaFoody(pedidoBling) {
   return {
     id: pedidoBling.data.numero.toString(),
     status: 'open',
-    deliveryFee: 5.0,  // Ajuste conforme sua regra de negócio
+    deliveryFee: Number(5.0).toFixed(2),
     paymentMethod: 'money',
     notes: 'sem observações',
-    courierFee: 4.0,
-    orderTotal: pedidoBling.data.total,
+    courierFee: Number(4.0).toFixed(2),
+    orderTotal: Number(pedidoBling.data.total).toFixed(2),
     orderDetails: '1x Produto exemplo',
     deliveryPoint: {
       address: 'Rua Exemplo, 123',
