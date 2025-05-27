@@ -11,33 +11,26 @@ async function enviarPedidoFoody(pedidoBling) {
 
   try {
     const response = await axios.post(
-  `${FOODY_URL}/logistics/delivery`,  // ✅ CORRETO
-  payload,
-  {
-    headers: {
-      'client-id': FOODY_CLIENT_ID,
-      'client-secret': FOODY_CLIENT_SECRET,
-      'Content-Type': 'application/json'
-    }
-  }
-);
-
+      `${FOODY_URL}/logistics/delivery`,
+      payload,
+      {
+        headers: {
+          'client-id': FOODY_CLIENT_ID,
+          'client-secret': FOODY_CLIENT_SECRET,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
     console.log('✅ Pedido enviado com sucesso:', response.data);
   } catch (error) {
-    console.error('❌ Erro ao processar pedido:', {
-      message: error.message,
-      data: error.response?.data,
-      status: error.response?.status,
-      path: error.config?.url
-    });
+    console.error('❌ Erro ao processar pedido:', error.response?.data || error.message);
   }
 }
 
 function transformarPedidoParaOpenDelivery(pedidoBling) {
   return {
     orderId: pedidoBling.data.numero.toString(),
-    status: "PLACED",
     customer: {
       name: "Cliente Exemplo",
       phone: "+5511999999999"
@@ -52,6 +45,14 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
     deliveryAddress: {
       street: "Rua Exemplo",
       number: "123",
+      city: "São Paulo",
+      state: "SP",
+      country: "BR",
+      postalCode: "00000-000"
+    },
+    pickupAddress: {
+      street: "Rua da Empresa",
+      number: "456",
       city: "São Paulo",
       state: "SP",
       country: "BR",
