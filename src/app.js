@@ -10,7 +10,10 @@ console.log('✅ FOODY_URL:', process.env.FOODY_OPEN_DELIVERY_URL);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Middleware para parsear JSON
 app.use(bodyParser.json());
+
+// Rota principal do webhook
 app.use('/webhook', blingWebhook);
 
 app.listen(PORT, () => {

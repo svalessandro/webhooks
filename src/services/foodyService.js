@@ -9,20 +9,21 @@ async function enviarPedidoFoody(pedidoBling) {
   console.log('🚀 Enviando pedido para Foody Open Delivery:', payload);
 
   try {
-    const token = await getAccessToken();
+    const accessToken = await getAccessToken();
 
     const response = await axios.post(
       `${FOODY_URL}/logistics/delivery`,
       payload,
       {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         }
       }
     );
 
     console.log('✅ Pedido enviado com sucesso:', response.data);
+
   } catch (error) {
     console.error('❌ Erro ao processar pedido:', error.response?.data || error.message);
   }
@@ -66,8 +67,8 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
       postalCode: "00000-000",
       complement: "Sala 2",
       reference: "Prédio azul",
-      latitude: -23.55000,
-      longitude: -46.63000,
+      latitude: -23.55,
+      longitude: -46.63,
       pickupLocation: "Recepção",
       parkingSpace: true,
       instructions: "Entrada lateral"
@@ -88,14 +89,8 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
       deliveryLimit: 60,
       orderCreatedAt: new Date().toISOString()
     },
-    totalOrderPrice: {
-      value: pedidoBling.data.total,
-      currency: "BRL"
-    },
-    orderDeliveryFee: {
-      value: 10.0,
-      currency: "BRL"
-    },
+    totalOrderPrice: { value: pedidoBling.data.total, currency: "BRL" },
+    orderDeliveryFee: { value: 10, currency: "BRL" },
     totalWeight: 1,
     packageVolume: 1,
     packageQuantity: 1,
@@ -107,16 +102,10 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
       offlineMethod: [
         {
           type: "CREDIT",
-          amount: {
-            value: pedidoBling.data.total,
-            currency: "BRL"
-          }
+          amount: { value: pedidoBling.data.total, currency: "BRL" }
         }
       ],
-      change: {
-        value: 0,
-        currency: "BRL"
-      }
+      change: { value: 0, currency: "BRL" }
     },
     combinedOrdersIds: [],
     sourceAppId: "BlingIntegration",
