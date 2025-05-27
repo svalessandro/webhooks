@@ -1,16 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const webhookRoutes = require('./routes/webhook');
-const oauthRoutes = require('./routes/oauth');
+require('dotenv').config();
+
+const blingWebhook = require('./routes/blingwebhook');
+const foodyWebhook = require('./routes/foodyWebhook');
 
 const app = express();
-const port = process.env.PORT || 8080;
-
 app.use(bodyParser.json());
 
-app.use('/webhook', webhookRoutes);
-app.use('/oauth', oauthRoutes);
+app.use('/webhook/bling', blingWebhook);
+app.use('/webhook/foody', foodyWebhook);
 
-app.listen(port, () => {
-  console.log(`🚀 Servidor rodando na porta ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
