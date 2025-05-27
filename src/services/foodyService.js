@@ -31,47 +31,57 @@ async function enviarPedidoFoody(pedidoBling) {
 function transformarPedidoParaOpenDelivery(pedidoBling) {
   return {
     orderId: pedidoBling.data.numero.toString(),
-    merchant: {
-      id: "41356153000153",  // Substituir se necessário
-      name: "Inlar Imoveis LTDA"
+    customer: {
+      name: "Cliente Exemplo",
+      phone: "+5511999999999"
     },
-    pickupAddress: {
-      country: "BR",
-      state: "SP",
-      city: "São Paulo",
-      district: "Centro",
-      street: "Rua Exemplo",
-      number: "100",
-      postalCode: "00000-000",
-      complement: "Sala 1",
-      reference: "Próximo ao metrô",
-      latitude: -23.55052,
-      longitude: -46.633308,
-      parkingSpace: true
-    },
-    notifyPickup: true,
-    notifyConclusion: true,
-    returnToMerchant: true,
-    canCombine: true,
+    items: [
+      {
+        name: "Produto Exemplo",
+        quantity: 1,
+        price: pedidoBling.data.total
+      }
+    ],
     deliveryAddress: {
       country: "BR",
       state: "SP",
       city: "São Paulo",
       district: "Centro",
       street: "Rua Exemplo",
-      number: "200",
+      number: "123",
       postalCode: "00000-000",
-      complement: "Apto 2",
-      reference: "Em frente ao shopping",
+      complement: "Apto 1",
+      reference: "Próximo à praça",
       latitude: -23.55052,
-      longitude: -46.633308
+      longitude: -46.63331,
+      instructions: "Deixar na portaria"
     },
+    pickupAddress: {
+      country: "BR",
+      state: "SP",
+      city: "São Paulo",
+      district: "Empresa",
+      street: "Rua da Empresa",
+      number: "456",
+      postalCode: "00000-000",
+      complement: "Sala 2",
+      reference: "Prédio azul",
+      latitude: -23.55000,
+      longitude: -46.63000,
+      pickupLocation: "Recepção",
+      parkingSpace: true,
+      instructions: "Entrada lateral"
+    },
+    notifyPickup: true,
+    notifyConclusion: true,
+    returnToMerchant: true,
+    canCombine: true,
     customerName: "Cliente Exemplo",
     vehicle: {
       type: ["MOTORBIKE_BAG"],
       container: "NORMAL",
       containerSize: "SMALL",
-      instruction: "Manusear com cuidado"
+      instruction: "Cuidado com o frágil"
     },
     limitTimes: {
       pickupLimit: 30,
@@ -86,10 +96,10 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
       value: 10.0,
       currency: "BRL"
     },
-    totalWeight: 1.0,
-    packageVolume: 1.0,
+    totalWeight: 1,
+    packageVolume: 1,
     packageQuantity: 1,
-    specialInstructions: "Entregar ao porteiro",
+    specialInstructions: "Manter na vertical",
     additionalPricePercentual: 0.1,
     payments: {
       method: "OFFLINE",
@@ -109,7 +119,7 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
       }
     },
     combinedOrdersIds: [],
-    sourceAppId: "bling-foody-integration",
+    sourceAppId: "BlingIntegration",
     sourceOrderId: pedidoBling.data.id.toString()
   };
 }

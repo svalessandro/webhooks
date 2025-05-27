@@ -10,9 +10,22 @@ let tokenExpiresAt = null;
 async function getAccessToken() {
   const now = Date.now();
 
+  if (!FOODY_TOKEN_URL) {
+    console.error('❌ FOODY_TOKEN_URL não está definido no ambiente!');
+    throw new Error('FOODY_TOKEN_URL ausente');
+  }
+
+  if (!FOODY_CLIENT_ID || !FOODY_CLIENT_SECRET) {
+    console.error('❌ FOODY_CLIENT_ID ou FOODY_CLIENT_SECRET não estão definidos!');
+    throw new Error('Credenciais de cliente ausentes');
+  }
+
   if (accessToken && tokenExpiresAt && now < tokenExpiresAt) {
+    console.log('✅ Usando token em cache');
     return accessToken;
   }
+
+  console.log('🔑 Solicitando novo token via OAuth2...');
 
   try {
     const response = await axios.post(
@@ -30,10 +43,11 @@ async function getAccessToken() {
     );
 
     accessToken = response.data.access_token;
-    const expiresIn = response.data.expires_in; // segundos
+    const expiresIn = response.data.expires_in; // em segundos
     tokenExpiresAt = now + expiresIn * 1000;
 
-    console.log('✅ Novo token obtido com sucesso.');
+    console.log('✅ Novo token obtido com sucesso. Expira em', expiresIn, 'segundos.');
+
     return accessToken;
 
   } catch (error) {
