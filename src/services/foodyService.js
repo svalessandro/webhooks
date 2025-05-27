@@ -1,10 +1,10 @@
 const axios = require('axios');
+const { getAccessToken } = require('./authService');
 
 const FOODY_URL = process.env.FOODY_OPEN_DELIVERY_URL;
-const FOODY_CLIENT_ID = process.env.FOODY_CLIENT_ID;
-const FOODY_CLIENT_SECRET = process.env.FOODY_CLIENT_SECRET;
 
 async function enviarPedidoFoody(pedidoBling) {
+  const token = await getAccessToken();
   const payload = transformarPedidoParaOpenDelivery(pedidoBling);
 
   console.log('🚀 Enviando pedido para Foody Open Delivery:', payload);
@@ -15,8 +15,7 @@ async function enviarPedidoFoody(pedidoBling) {
       payload,
       {
         headers: {
-          'client-id': FOODY_CLIENT_ID,
-          'client-secret': FOODY_CLIENT_SECRET,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       }
@@ -31,33 +30,90 @@ async function enviarPedidoFoody(pedidoBling) {
 function transformarPedidoParaOpenDelivery(pedidoBling) {
   return {
     orderId: pedidoBling.data.numero.toString(),
-    customer: {
-      name: "Cliente Exemplo",
-      phone: "+5511999999999"
-    },
-    items: [
-      {
-        name: "Produto Exemplo",
-        quantity: 1,
-        price: pedidoBling.data.total
-      }
-    ],
-    deliveryAddress: {
-      street: "Rua Exemplo",
-      number: "123",
-      city: "São Paulo",
-      state: "SP",
-      country: "BR",
-      postalCode: "00000-000"
+    orderDisplayId: pedidoBling.data.numero.toString(),
+    merchant: {
+      id: '41356153000153',
+      name: 'Inlar Imoveis LTDA'
     },
     pickupAddress: {
-      street: "Rua da Empresa",
-      number: "456",
-      city: "São Paulo",
-      state: "SP",
-      country: "BR",
-      postalCode: "00000-000"
-    }
+      country: 'BR',
+      state: 'BR-SP',
+      city: 'São Paulo',
+      district: 'Centro',
+      street: 'Rua da Empresa',
+      number: '456',
+      postalCode: '00000-000',
+      complement: 'Sala 01',
+      reference: 'Próximo ao metrô',
+      latitude: -23.55052,
+      longitude: -46.633308,
+      pickupLocation: 'Recepção',
+      parkingSpace: true,
+      instructions: 'Retirar na recepção'
+    },
+    notifyPickup: true,
+    notifyConclusion: true,
+    returnToMerchant: true,
+    canCombine: true,
+    deliveryAddress: {
+      country: 'BR',
+      state: 'BR-SP',
+      city: 'São Paulo',
+      district: 'Centro',
+      street: 'Rua Exemplo',
+      number: '123',
+      postalCode: '00000-000',
+      complement: 'Apto 1',
+      reference: 'Prédio Azul',
+      latitude: -23.55052,
+      longitude: -46.633308,
+      instructions: 'Deixar com o porteiro'
+    },
+    customerName: 'Cliente Exemplo',
+    vehicle: {
+      type: ['MOTORBIKE_BAG'],
+      container: 'NORMAL',
+      containerSize: 'SMALL',
+      instruction: 'Manter na posição vertical'
+    },
+    limitTimes: {
+      pickupLimit: 30,
+      deliveryLimit: 60,
+      orderCreatedAt: new Date().toISOString()
+    },
+    totalOrderPrice: {
+      value: pedidoBling.data.total,
+      currency: 'BRL'
+    },
+    orderDeliveryFee: {
+      value: 10.0,
+      currency: 'BRL'
+    },
+    totalWeight: 1,
+    packageVolume: 1,
+    packageQuantity: 1,
+    specialInstructions: 'Frágil, manusear com cuidado',
+    additionalPricePercentual: 0.1,
+    payments: {
+      method: 'OFFLINE',
+      wirelessPos: true,
+      offlineMethod: [
+        {
+          type: 'CREDIT',
+          amount: {
+            value: pedidoBling.data.total,
+            currency: 'BRL'
+          }
+        }
+      ],
+      change: {
+        value: 0,
+        currency: 'BRL'
+      }
+    },
+    combinedOrdersIds: [],
+    sourceAppId: 'SistemaIntegração',
+    sourceOrderId: pedidoBling.data.id.toString()
   };
 }
 
