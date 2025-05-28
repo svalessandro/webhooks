@@ -31,6 +31,7 @@ async function enviarPedidoFoody(pedidoBling) {
 function transformarPedidoParaOpenDelivery(pedidoBling) {
   return {
     orderId: pedidoBling.data.numero.toString(),
+    orderDisplayId: pedidoBling.data.numero.toString(),  // ✅ adicionado para evitar erro E17
     customer: {
       name: "Cliente Exemplo",
       phone: "+5511999999999"
