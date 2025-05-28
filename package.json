@@ -1,14 +1,23 @@
 {
   "name": "bling-foody-opendelivery",
   "version": "1.0.0",
+  "description": "Integração entre Bling e Foody Open Delivery",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js"
   },
+  "keywords": [
+    "bling",
+    "foody",
+    "open-delivery",
+    "integration"
+  ],
+  "author": "Seu Nome",
+  "license": "MIT",
   "dependencies": {
-    "axios": "^1.9.0",
+    "axios": "^1.6.8",
     "body-parser": "^1.20.2",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2"
   }
 }

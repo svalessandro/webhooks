@@ -1,8 +1,9 @@
 const axios = require('axios');
 
+const BLING_API_URL = process.env.BLING_API_URL; // https://api.bling.com.br/Api/v3
 const BLING_CLIENT_ID = process.env.BLING_CLIENT_ID;
 const BLING_CLIENT_SECRET = process.env.BLING_CLIENT_SECRET;
-const BLING_TOKEN_URL = process.env.BLING_TOKEN_URL;
+const BLING_AUTH_CODE = process.env.BLING_AUTH_CODE; // gerado no processo OAuth
 
 let accessToken = null;
 let tokenExpiresAt = null;
@@ -17,22 +18,25 @@ async function getBlingAccessToken() {
   console.log('🔑 Solicitando novo token Bling via OAuth2...');
 
   try {
+    const base64Credentials = Buffer.from(`${BLING_CLIENT_ID}:${BLING_CLIENT_SECRET}`).toString('base64');
+
     const response = await axios.post(
-      BLING_TOKEN_URL,
+      `${BLING_API_URL}/oauth/token`,
       new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: BLING_CLIENT_ID,
-        client_secret: BLING_CLIENT_SECRET
+        grant_type: 'authorization_code',
+        code: BLING_AUTH_CODE
       }),
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Authorization': `Basic ${base64Credentials}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': '1.0'
         }
       }
     );
 
     accessToken = response.data.access_token;
-    const expiresIn = response.data.expires_in || 3600;
+    const expiresIn = response.data.expires_in || 21600; // 6 horas
     tokenExpiresAt = now + expiresIn * 1000;
 
     console.log(`✅ Token Bling obtido. Expira em ${expiresIn} segundos.`);

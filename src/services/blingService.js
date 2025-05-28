@@ -3,26 +3,34 @@ const { getBlingAccessToken } = require('./blingAuthService');
 
 const BLING_API_URL = process.env.BLING_API_URL;
 
-async function obterDetalhesPedidoBling(pedidoId) {
+async function obterPedidoBling(pedidoId) {
   const token = await getBlingAccessToken();
 
-  try {
-    const response = await axios.get(
-      `${BLING_API_URL}/pedidos/${pedidoId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+  const response = await axios.get(
+    `${BLING_API_URL}/pedidos/${pedidoId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    );
+    }
+  );
 
-    console.log('✅ Detalhes do pedido obtidos:', response.data);
-    return response.data;
-
-  } catch (error) {
-    console.error('❌ Erro ao obter detalhes do pedido:', error.response?.data || error.message);
-    throw new Error('Falha ao obter detalhes do pedido Bling');
-  }
+  return response.data;
 }
 
-module.exports = { obterDetalhesPedidoBling };
+async function obterContatoBling(contatoId) {
+  const token = await getBlingAccessToken();
+
+  const response = await axios.get(
+    `${BLING_API_URL}/contatos/${contatoId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return response.data;
+}
+
+module.exports = { obterPedidoBling, obterContatoBling };
