@@ -1,19 +1,27 @@
 const express = require('express');
+const router = express.Router();
+const { obterDetalhesPedidoBling } = require('../services/blingService');
 const { enviarPedidoFoody } = require('../services/foodyService');
 
-const router = express.Router();
-
 router.post('/bling', async (req, res) => {
-  const pedido = req.body;
+  console.log('📦 Webhook recebido do Bling:', req.body);
 
-  console.log('📦 Webhook recebido do Bling:', pedido);
+  const pedidoId = req.body.data?.id;
+
+  if (!pedidoId) {
+    console.error('❌ ID do pedido não encontrado.');
+    return res.status(400).send('ID do pedido não encontrado');
+  }
 
   try {
-    await enviarPedidoFoody(pedido);
-    res.status(200).json({ message: 'Pedido processado com sucesso!' });
+    const pedidoDetalhado = await obterDetalhesPedidoBling(pedidoId);
+
+    await enviarPedidoFoody(pedidoDetalhado);
+
+    res.status(200).send('Pedido processado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao processar pedido:', error.message);
-    res.status(500).json({ message: 'Erro ao processar pedido.' });
+    res.status(500).send('Erro ao processar pedido');
   }
 });
 
