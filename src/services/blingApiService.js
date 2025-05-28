@@ -38,7 +38,7 @@ async function consultarContatoPorId(contatoId) {
       }
     );
 
-    console.log('✅ Contato consultado no Bling:', response.data);
+    console.log('✅ Contato detalhado consultado no Bling:', response.data);
     return response.data;
 
   } catch (error) {

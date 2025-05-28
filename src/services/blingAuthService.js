@@ -1,111 +1,71 @@
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 const BLING_CLIENT_ID = process.env.BLING_CLIENT_ID;
 const BLING_CLIENT_SECRET = process.env.BLING_CLIENT_SECRET;
-const BLING_TOKEN_URL = process.env.BLING_TOKEN_URL;  // exemplo: 'https://www.bling.com.br/Api/v3/oauth/token'
+const BLING_TOKEN_URL = process.env.BLING_TOKEN_URL;
 
-let accessToken = null;
-let refreshToken = null;
-let tokenExpiresAt = null;
+let tokensPath = path.resolve(__dirname, '../../bling_tokens.json');
 
-/**
- * Troca o authorization_code por access_token e refresh_token.
- */
-async function exchangeAuthorizationCodeForToken(authorizationCode) {
-  console.log('🔑 Trocando authorization_code por access_token...');
+let tokens = {
+  refresh_token: process.env.BLING_REFRESH_TOKEN,
+  access_token: null,
+  expires_at: null
+};
 
-  const credentials = Buffer.from(`${BLING_CLIENT_ID}:${BLING_CLIENT_SECRET}`).toString('base64');
-
-  try {
-    const response = await axios.post(
-      BLING_TOKEN_URL,
-      new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: authorizationCode
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': '1.0',
-          'Authorization': `Basic ${credentials}`
-        }
-      }
-    );
-
-    accessToken = response.data.access_token;
-    refreshToken = response.data.refresh_token;
-    const expiresIn = response.data.expires_in || 21600; // padrão 6 horas
-    tokenExpiresAt = Date.now() + expiresIn * 1000;
-
-    console.log(`✅ Access token obtido. Expira em ${expiresIn} segundos.`);
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: expiresIn
-    };
-
-  } catch (error) {
-    console.error('❌ Erro ao trocar authorization_code:', error.response?.data || error.message);
-    throw new Error('Falha na troca do authorization_code');
-  }
+// Carregar tokens do arquivo se existir
+if (fs.existsSync(tokensPath)) {
+  tokens = JSON.parse(fs.readFileSync(tokensPath));
 }
 
-/**
- * Obtém token válido, usando refresh_token se necessário.
- */
 async function getBlingAccessToken() {
   const now = Date.now();
 
-  if (accessToken && tokenExpiresAt && now < tokenExpiresAt) {
-    return accessToken;
+  if (tokens.access_token && tokens.expires_at && now < tokens.expires_at) {
+    return tokens.access_token;
   }
 
-  if (refreshToken) {
-    return await refreshAccessToken();
+  if (!tokens.refresh_token) {
+    throw new Error('Nenhum refresh token disponível. Realize a autorização inicial.');
   }
 
-  throw new Error('Nenhum token disponível. Realize a autorização inicial.');
-}
-
-/**
- * Usa refresh_token para obter novo access_token.
- */
-async function refreshAccessToken() {
-  console.log('🔄 Atualizando access_token via refresh_token...');
-
-  const credentials = Buffer.from(`${BLING_CLIENT_ID}:${BLING_CLIENT_SECRET}`).toString('base64');
+  console.log('🔑 Solicitando novo access token via refresh_token...');
 
   try {
     const response = await axios.post(
       BLING_TOKEN_URL,
       new URLSearchParams({
         grant_type: 'refresh_token',
-        refresh_token: refreshToken
+        refresh_token: tokens.refresh_token
       }),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': '1.0',
-          'Authorization': `Basic ${credentials}`
+          'Authorization': 'Basic ' + Buffer.from(`${BLING_CLIENT_ID}:${BLING_CLIENT_SECRET}`).toString('base64')
         }
       }
     );
 
-    accessToken = response.data.access_token;
-    refreshToken = response.data.refresh_token;
-    const expiresIn = response.data.expires_in || 21600;
-    tokenExpiresAt = Date.now() + expiresIn * 1000;
+    tokens.access_token = response.data.access_token;
+    const expiresIn = response.data.expires_in || 3600;
+    tokens.expires_at = now + expiresIn * 1000;
 
-    console.log(`✅ Novo access token obtido via refresh. Expira em ${expiresIn} segundos.`);
-    return accessToken;
+    if (response.data.refresh_token) {
+      tokens.refresh_token = response.data.refresh_token;
+      console.log(`🔄 Novo refresh_token recebido e salvo.`);
+    }
+
+    // Salva no arquivo
+    fs.writeFileSync(tokensPath, JSON.stringify(tokens, null, 2));
+
+    console.log(`✅ Novo access_token obtido. Expira em ${expiresIn} segundos.`);
+    return tokens.access_token;
 
   } catch (error) {
-    console.error('❌ Erro ao atualizar access_token:', error.response?.data || error.message);
-    throw new Error('Falha ao atualizar access_token');
+    console.error('❌ Erro ao obter access token Bling:', error.response?.data || error.message);
+    throw new Error('Falha ao obter token de autenticação Bling');
   }
 }
 
-module.exports = { 
-  exchangeAuthorizationCodeForToken,
-  getBlingAccessToken
-};
+module.exports = { getBlingAccessToken };
