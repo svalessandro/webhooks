@@ -1,11 +1,8 @@
 const axios = require('axios');
 const { getBlingAccessToken } = require('./blingAuthService');
 
-const BLING_API_BASE_URL = process.env.BLING_API_BASE_URL || 'https://api.bling.com.br/Api/v3';
+const BLING_API_BASE_URL = process.env.BLING_API_BASE_URL;
 
-/**
- * Consulta detalhes de um pedido no Bling.
- */
 async function consultarPedidoBling(pedidoId) {
   const token = await getBlingAccessToken();
 
@@ -28,9 +25,6 @@ async function consultarPedidoBling(pedidoId) {
   }
 }
 
-/**
- * Consulta detalhes de um contato (cliente) no Bling.
- */
 async function consultarContatoPorId(contatoId) {
   const token = await getBlingAccessToken();
 
