@@ -32,6 +32,12 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
   return {
     orderId: pedidoBling.data.numero.toString(),
     orderDisplayId: pedidoBling.data.numero.toString(),  // ✅ adicionado para evitar erro E17
+
+    merchant: {
+      id: "00000000000000-teste",   // ✅ Aqui coloque o CNPJ ou ID oficial
+      name: "Minha Empresa"         // ✅ Nome da empresa
+    },
+
     customer: {
       name: "Cliente Exemplo",
       phone: "+5511999999999"
