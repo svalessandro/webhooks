@@ -29,40 +29,43 @@ async function enviarPedidoFoody(pedidoBling) {
 }
 
 function transformarPedidoParaOpenDelivery(pedidoBling) {
+  const endereco = pedidoBling.contato.endereco;
+
   return {
-    orderId: pedidoBling.data.numero.toString(),
-    orderDisplayId: pedidoBling.data.numero.toString(),  // ✅ adicionado para evitar erro E17
+    orderId: pedidoBling.numero.toString(),
+    orderDisplayId: pedidoBling.numero.toString(),
 
     merchant: {
-      id: "00000000000000-teste",   // ✅ Aqui coloque o CNPJ ou ID oficial
-      name: "Minha Empresa"         // ✅ Nome da empresa
+      id: "12345678000199-fake", // pode deixar fixo por enquanto
+      name: "Minha Empresa"
     },
 
     customer: {
-      name: "Cliente Exemplo",
-      phone: "+5511999999999"
+      name: pedidoBling.contato.nome,
+      phone: pedidoBling.contato.telefone
     },
-    items: [
-      {
-        name: "Produto Exemplo",
-        quantity: 1,
-        price: pedidoBling.data.total
-      }
-    ],
+
+    items: pedidoBling.itens.map(item => ({
+      name: item.descricao,
+      quantity: item.quantidade,
+      price: item.valor
+    })),
+
     deliveryAddress: {
       country: "BR",
-      state: "SP",
-      city: "São Paulo",
-      district: "Centro",
-      street: "Rua Exemplo",
-      number: "123",
-      postalCode: "00000-000",
-      complement: "Apto 1",
-      reference: "Próximo à praça",
-      latitude: -23.55052,
-      longitude: -46.63331,
+      state: endereco.estado,
+      city: endereco.cidade,
+      district: endereco.bairro,
+      street: endereco.rua,
+      number: endereco.numero,
+      postalCode: endereco.cep,
+      complement: endereco.complemento,
+      reference: endereco.referencia,
+      latitude: -23.55052,  // opcional → se não tiver, deixar fixo
+      longitude: -46.63331, // idem
       instructions: "Deixar na portaria"
     },
+
     pickupAddress: {
       country: "BR",
       state: "SP",
@@ -79,42 +82,51 @@ function transformarPedidoParaOpenDelivery(pedidoBling) {
       parkingSpace: true,
       instructions: "Entrada lateral"
     },
+
     notifyPickup: true,
     notifyConclusion: true,
     returnToMerchant: true,
     canCombine: true,
-    customerName: "Cliente Exemplo",
+
+    customerName: pedidoBling.contato.nome,
+
     vehicle: {
       type: ["MOTORBIKE_BAG"],
       container: "NORMAL",
       containerSize: "SMALL",
       instruction: "Cuidado com o frágil"
     },
+
     limitTimes: {
       pickupLimit: 30,
       deliveryLimit: 60,
       orderCreatedAt: new Date().toISOString()
     },
-    totalOrderPrice: { value: pedidoBling.data.total, currency: "BRL" },
+
+    totalOrderPrice: { value: pedidoBling.total, currency: "BRL" },
     orderDeliveryFee: { value: 10, currency: "BRL" },
+
     totalWeight: 1,
     packageVolume: 1,
-    packageQuantity: 1,
+    packageQuantity: pedidoBling.itens.length,
+
     specialInstructions: "Manter na vertical",
+
     payments: {
-      method: "OFFLINE",
+      method: pedidoBling.formaPagamento || "OFFLINE",
       wirelessPos: true,
       offlineMethod: [
         {
           type: "CREDIT",
-          amount: { value: pedidoBling.data.total, currency: "BRL" }
+          amount: { value: pedidoBling.total, currency: "BRL" }
         }
       ],
       change: { value: 0, currency: "BRL" }
     },
+
     combinedOrdersIds: [],
     sourceAppId: "BlingIntegration",
-    sourceOrderId: pedidoBling.data.id.toString()
+    sourceOrderId: pedidoBling.id.toString()
   };
 }
 
