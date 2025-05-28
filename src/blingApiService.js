@@ -1,53 +1,28 @@
 const axios = require('axios');
 const { getBlingAccessToken } = require('./blingAuthService');
 
-const BLING_API_URL = 'https://api.bling.com.br/Api/v3';
+const BLING_API_BASE_URL = process.env.BLING_API_BASE_URL || 'https://api.bling.com.br/Api/v3';
 
-async function consultarContatoPorId(contatoId) {
+async function consultarPedidoBling(pedidoId) {
   const token = await getBlingAccessToken();
 
   try {
     const response = await axios.get(
-      `${BLING_API_URL}/contatos/${contatoId}`,
+      `${BLING_API_BASE_URL}/pedidos/${pedidoId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json'
+          Authorization: `Bearer ${token}`
         }
       }
     );
 
-    console.log('✅ Contato retornado com sucesso:', response.data);
+    console.log('✅ Pedido detalhado consultado no Bling:', response.data);
     return response.data;
+
   } catch (error) {
-    console.error('❌ Erro ao consultar contato:', error.response?.data || error.message);
-    throw new Error('Falha ao consultar contato no Bling');
-  }
-}
-
-async function consultarPedidoPorId(pedidoId) {
-  const token = await getBlingAccessToken();
-
-  try {
-    const response = await axios.get(
-      `${BLING_API_URL}/pedidos/${pedidoId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json'
-        }
-      }
-    );
-
-    console.log('✅ Pedido retornado com sucesso:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('❌ Erro ao consultar pedido:', error.response?.data || error.message);
+    console.error('❌ Erro ao consultar pedido no Bling:', error.response?.data || error.message);
     throw new Error('Falha ao consultar pedido no Bling');
   }
 }
 
-module.exports = {
-  consultarContatoPorId,
-  consultarPedidoPorId
-};
+module.exports = { consultarPedidoBling };
