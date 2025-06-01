@@ -3,23 +3,8 @@ const { getAccessToken } = require('./authService');
 
 const FOODY_URL = process.env.FOODY_OPEN_DELIVERY_URL;
 
-async function enviarPedidoFoody(pedido) {
+async function enviarPedidoFoody(payload) {
   const token = await getAccessToken();
-
-  const payload = {
-    orderId: pedido.id,
-    orderDisplayId: pedido.numero, // ✅ Campo obrigatório para o Foody
-    cliente: {
-      nome: pedido.contato?.nome || 'Sem nome',
-      cpf: pedido.contato?.numeroDocumento || '',
-      endereco: pedido.transporte?.etiqueta?.endereco || 'Sem endereço'
-    },
-    produtos: (pedido.itens || []).map(item => ({
-      descricao: item.descricao,
-      quantidade: item.quantidade,
-      preco: item.valor
-    }))
-  };
 
   console.log('🚀 Enviando pedido para Foody Open Delivery:', payload);
 

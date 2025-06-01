@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { consultarPedidoBling } = require('../services/blingApiService');
 const { enviarPedidoFoody } = require('../services/foodyService');
+const { transformarPedidoParaOpenDelivery } = require('../utils/foodyPayloadBuilder'); // Certifique-se de que o caminho está correto
 
 router.post('/bling', async (req, res) => {
   const pedidoBling = req.body.data;
@@ -15,31 +16,19 @@ router.post('/bling', async (req, res) => {
   }
 
   try {
-        const pedidoDetalhado = await consultarPedidoBling(pedidoBling.id, pedidoBling.numero);
-        const pedido = pedidoDetalhado?.data;
+    // Consulta detalhada no Bling
+    const pedidoDetalhado = await consultarPedidoBling(pedidoBling.id, pedidoBling.numero);
+    const pedido = pedidoDetalhado?.data;
 
-        if (!pedido || !pedido.id || !pedido.numero) {
-          throw new Error('Pedido retornado do Bling está incompleto.');
-        }
+    if (!pedido || !pedido.id || !pedido.numero) {
+      throw new Error('Pedido retornado do Bling está incompleto.');
+    }
 
-        await enviarPedidoFoody({
-          orderId: pedido.id,
-          orderDisplayId: pedido.numero,
-          cliente: {
-            nome: pedido.contato?.nome || 'Sem nome',
-            cpf: pedido.contato?.numeroDocumento || '',
-            endereco: pedido.transporte?.etiqueta?.endereco || 'Sem endereço'
-          },
-          produtos: (pedido.itens || []).map(item => ({
-            descricao: item.descricao,
-            quantidade: item.quantidade,
-            preco: item.valor
-          }))
-        });
+    // Transforma o pedido para o formato do Foody
+    const payloadFoody = transformarPedidoParaOpenDelivery(pedido);
 
-
-    // Envia para o Foody
-    await enviarPedidoFoody(pedidoFoody);
+    // Envia para a Foody
+    await enviarPedidoFoody(payloadFoody);
 
     console.log('✅ Pedido processado com sucesso!');
     res.status(200).send('Pedido processado com sucesso.');
