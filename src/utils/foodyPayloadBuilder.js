@@ -1,6 +1,6 @@
 const { obterCoordenadasPorEndereco } = require('../utils/geocodificador');
 
-async function montarPayloadFoody(pedido) {
+async function transformarPedidoParaOpenDelivery(pedido) {
   const enderecoEntrega = pedido.transporte?.etiqueta;
   const enderecoTexto = `${enderecoEntrega?.endereco || ''}, ${enderecoEntrega?.numero || ''}, ${enderecoEntrega?.municipio || ''} - ${enderecoEntrega?.uf || ''}, ${enderecoEntrega?.cep || ''}`;
 
