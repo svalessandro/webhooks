@@ -25,7 +25,10 @@ router.post('/bling', async (req, res) => {
     }
 
     // Transforma o pedido para o formato do Foody
-    const payloadFoody = transformarPedidoParaOpenDelivery(pedido);
+    const payloadFoody = await transformarPedidoParaOpenDelivery(pedido); // ❗ agora com await
+    console.log('🚀 Enviando pedido para Foody Open Delivery:', payloadFoody);
+    await enviarPedidoFoody(payloadFoody);
+
 
     // Envia para a Foody
     await enviarPedidoFoody(payloadFoody);
