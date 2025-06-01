@@ -21,8 +21,13 @@ async function enviarPedidoFoody(payload) {
     );
 
     console.log('✅ Pedido enviado com sucesso:', response.data);
-  } catch (error) {
-    console.error('❌ Erro ao processar pedido:', error.response?.data || error.message);
+    } catch (error) {
+    console.error('❌ Erro ao processar pedido:', {
+      status: error.response?.status,
+      headers: error.response?.headers,
+      data: error.response?.data,
+      message: error.message
+    });
   }
 }
 
