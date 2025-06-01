@@ -1,7 +1,11 @@
-function transformarPedidoParaOpenDelivery(data) {
+// src/utils/foodyPayloadBuilder.js
+
+function transformarPedidoParaOpenDelivery(pedido) {
   return {
-    orderId: data.id?.toString() || "SEM_ID",
-    orderDisplayId: data.numero?.toString() || "SEM_NUMERO",
+    orderId: pedido.id?.toString() || 'undefined',
+    orderDisplayId: pedido.numero?.toString() || 'undefined',
+    sourceOrderId: pedido.id?.toString() || 'undefined',
+    sourceAppId: 'BlingIntegration',
 
     merchant: {
       id: "00000000000000-teste",
@@ -9,14 +13,16 @@ function transformarPedidoParaOpenDelivery(data) {
     },
 
     customer: {
-      name: data.contato?.nome || "Sem nome",
-      phone: "+550000000000"
+      name: pedido.contato?.nome || 'Sem nome',
+      phone: '+550000000000' // Aqui você pode melhorar depois com telefone real
     },
 
-    items: (data.itens || []).map(item => ({
-      name: item.descricao || "Produto sem nome",
-      quantity: item.quantidade || 1,
-      price: item.valor || 0
+    customerName: pedido.contato?.nome || 'Sem nome', // ← CAMPO QUE ESTAVA FALTANDO
+
+    items: (pedido.itens || []).map(item => ({
+      name: item.descricao,
+      quantity: item.quantidade,
+      price: item.valor
     })),
 
     deliveryAddress: {
@@ -69,16 +75,8 @@ function transformarPedidoParaOpenDelivery(data) {
       orderCreatedAt: new Date().toISOString()
     },
 
-    totalOrderPrice: {
-      value: data.total || 0,
-      currency: "BRL"
-    },
-
-    orderDeliveryFee: {
-      value: 10,
-      currency: "BRL"
-    },
-
+    totalOrderPrice: { value: pedido.total, currency: "BRL" },
+    orderDeliveryFee: { value: 10, currency: "BRL" },
     totalWeight: 1,
     packageVolume: 1,
     packageQuantity: 1,
@@ -90,21 +88,13 @@ function transformarPedidoParaOpenDelivery(data) {
       offlineMethod: [
         {
           type: "CREDIT",
-          amount: {
-            value: data.total || 0,
-            currency: "BRL"
-          }
+          amount: { value: pedido.total, currency: "BRL" }
         }
       ],
-      change: {
-        value: 0,
-        currency: "BRL"
-      }
+      change: { value: 0, currency: "BRL" }
     },
 
-    combinedOrdersIds: [],
-    sourceAppId: "BlingIntegration",
-    sourceOrderId: data.id?.toString() || "SEM_ID"
+    combinedOrdersIds: []
   };
 }
 
