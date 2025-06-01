@@ -1,38 +1,44 @@
-const transformarPedidoParaOpenDelivery = (pedido) => {
-  const etiqueta = pedido.transporte?.etiqueta || {};
+const { obterCoordenadasPorEndereco } = require('../utils/geocodificador');
+
+async function montarPayloadFoody(pedido) {
+  const enderecoEntrega = pedido.transporte?.etiqueta;
+  const enderecoTexto = `${enderecoEntrega?.endereco || ''}, ${enderecoEntrega?.numero || ''}, ${enderecoEntrega?.municipio || ''} - ${enderecoEntrega?.uf || ''}, ${enderecoEntrega?.cep || ''}`;
+
+  const coords = await obterCoordenadasPorEndereco(enderecoTexto);
 
   return {
     orderId: pedido.id.toString(),
     orderDisplayId: pedido.numero.toString(),
-    sourceOrderId: pedido.id.toString(),
-    sourceAppId: 'BlingIntegration',
+
     merchant: {
-      id: '00000000000000-teste',
-      name: 'Minha Empresa'
+      id: "00000000000000-teste",
+      name: "Minha Empresa"
     },
+
     customer: {
-      name: pedido.contato?.nome || 'Cliente não identificado',
-      phone: '+550000000000' // Substituir se possível
+      name: pedido.contato?.nome || 'Sem nome',
+      phone: '+550000000000'
     },
-    customerName: pedido.contato?.nome || 'Cliente não identificado',
+
     items: (pedido.itens || []).map(item => ({
-      name: item.descricao,
-      quantity: item.quantidade,
-      price: item.valor
+      name: item.descricao || 'Produto',
+      quantity: item.quantidade || 1,
+      price: item.valor || 0
     })),
+
     deliveryAddress: {
+      street: enderecoEntrega?.endereco || '',
+      number: enderecoEntrega?.numero || '',
+      district: enderecoEntrega?.bairro || '',
+      city: enderecoEntrega?.municipio || '',
+      state: enderecoEntrega?.uf || '',
+      postalCode: enderecoEntrega?.cep || '',
       country: 'BR',
-      state: etiqueta.uf || '',
-      city: etiqueta.municipio || '',
-      district: etiqueta.bairro || '',
-      street: etiqueta.endereco || '',
-      number: etiqueta.numero || '',
-      postalCode: etiqueta.cep || '',
-      complement: etiqueta.complemento || '',
-      reference: etiqueta.referencia || '',
-      latitude: -23.55052,
-      longitude: -46.63331,
-      instructions: 'Deixar na portaria'
+      complement: enderecoEntrega?.complemento || '',
+      reference: '',
+      latitude: coords?.latitude || -23.55052,
+      longitude: coords?.longitude || -46.63331,
+      instructions: ''
     },
     pickupAddress: {
       country: 'BR',
