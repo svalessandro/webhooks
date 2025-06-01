@@ -8,7 +8,7 @@ async function consultarPedidoBling(pedidoId, numeroPedido) {
 
   try {
     const response = await axios.get(
-      `${BLING_API_BASE_URL}/pedidos/${pedidoId}`,
+      `${BLING_API_BASE_URL}/pedidos/vendas/${pedidoId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
