@@ -15,11 +15,26 @@ router.post('/bling', async (req, res) => {
   }
 
   try {
-    // Consulta detalhada no Bling, com fallback
+    // Consulta detalhada no Bling
     const pedidoDetalhado = await consultarPedidoBling(pedidoBling.id, pedidoBling.numero);
 
+    // Monta o payload para o Foody
+    const pedidoFoody = {
+      orderId: pedidoDetalhado.data.id,
+      cliente: {
+        nome: pedidoDetalhado.data.contato?.nome || 'Sem nome',
+        cpf: pedidoDetalhado.data.contato?.numeroDocumento || '',
+        endereco: pedidoDetalhado.data.transporte?.etiqueta?.endereco || 'Sem endereço'
+      },
+      produtos: (pedidoDetalhado.data.itens || []).map(item => ({
+        descricao: item.descricao,
+        quantidade: item.quantidade,
+        preco: item.valor
+      }))
+    };
+
     // Envia para o Foody
-    await enviarPedidoFoody(pedidoDetalhado);
+    await enviarPedidoFoody(pedidoFoody);
 
     console.log('✅ Pedido processado com sucesso!');
     res.status(200).send('Pedido processado com sucesso.');
