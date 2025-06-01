@@ -9,6 +9,7 @@ async function transformarPedidoParaOpenDelivery(pedido) {
   return {
     orderId: pedido.id.toString(),
     orderDisplayId: pedido.numero.toString(),
+    customerName: pedido.contato?.nome || 'Nome não informado', // ✅ aqui!
 
     merchant: {
       id: "00000000000000-teste",
