@@ -15,23 +15,28 @@ router.post('/bling', async (req, res) => {
   }
 
   try {
-    // Consulta detalhada no Bling
-    const pedidoDetalhado = await consultarPedidoBling(pedidoBling.id, pedidoBling.numero);
+        const pedidoDetalhado = await consultarPedidoBling(pedidoBling.id, pedidoBling.numero);
+        const pedido = pedidoDetalhado?.data;
 
-    // Monta o payload para o Foody
-    const pedidoFoody = {
-      orderId: pedidoDetalhado.data.id,
-      cliente: {
-        nome: pedidoDetalhado.data.contato?.nome || 'Sem nome',
-        cpf: pedidoDetalhado.data.contato?.numeroDocumento || '',
-        endereco: pedidoDetalhado.data.transporte?.etiqueta?.endereco || 'Sem endereço'
-      },
-      produtos: (pedidoDetalhado.data.itens || []).map(item => ({
-        descricao: item.descricao,
-        quantidade: item.quantidade,
-        preco: item.valor
-      }))
-    };
+        if (!pedido || !pedido.id || !pedido.numero) {
+          throw new Error('Pedido retornado do Bling está incompleto.');
+        }
+
+        await enviarPedidoFoody({
+          orderId: pedido.id,
+          orderDisplayId: pedido.numero,
+          cliente: {
+            nome: pedido.contato?.nome || 'Sem nome',
+            cpf: pedido.contato?.numeroDocumento || '',
+            endereco: pedido.transporte?.etiqueta?.endereco || 'Sem endereço'
+          },
+          produtos: (pedido.itens || []).map(item => ({
+            descricao: item.descricao,
+            quantidade: item.quantidade,
+            preco: item.valor
+          }))
+        });
+
 
     // Envia para o Foody
     await enviarPedidoFoody(pedidoFoody);
