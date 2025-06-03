@@ -23,6 +23,7 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     orderId: pedido.id.toString(),
     orderDisplayId: pedido.numero.toString(),
     customerName: contato.nome || 'Nome não informado',
+    customerPhone: contato.celular || "Telefone não informado",
     customerPhoneLocalizer: contato.celular || "Telefone não informado",
 
     merchant: {
@@ -32,13 +33,13 @@ async function transformarPedidoParaOpenDelivery(pedido) {
 
     customer: {
       name: contato.nome || 'Sem nome',
-      phone: contato.customerPhoneLocalizer || '+550000000000'
+      phone: contato.celular || '+550000000000'
     },
 
-    items: (pedido.itens || []).map(item => ({
-      name: item.descricao || 'Produto',
-      quantity: item.quantidade || 1,
-      price: item.valor || 0
+    items: (pedido.itens || []).map(wrapper => ({
+      name: wrapper.item?.descricao || 'Produto',
+      quantity: wrapper.item?.quantidade || 1,
+      price: wrapper.item?.valor || 0
     })),
 
     deliveryAddress: {
@@ -96,11 +97,6 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     totalWeight: 1,
     packageVolume: 1,
     packageQuantity: 1,
-    items: (pedido.itens || []).map(item => ({
-      name: item.descricao || 'Produto',
-      quantity: item.quantidade || 1,
-      price: item.valor || 0
-    })),
     specialInstructions: '',
 
     payments: {
