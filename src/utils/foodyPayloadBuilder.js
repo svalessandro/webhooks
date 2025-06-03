@@ -23,6 +23,7 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     orderId: pedido.id.toString(),
     orderDisplayId: pedido.numero.toString(),
     customerName: contato.nome || 'Nome não informado',
+    customerPhoneLocalizer: contato.celular || "Telefone não informado",
 
     merchant: {
       id: "00000000000000-teste",
@@ -42,13 +43,13 @@ async function transformarPedidoParaOpenDelivery(pedido) {
 
     deliveryAddress: {
       street: enderecoGeral.endereco || '',
-      number: enderecoGeral.numero || '',
+      number: enderecoGeral.numero || 'sem numero',
       district: enderecoGeral.bairro || '',
       city: enderecoGeral.municipio || '',
       state: enderecoGeral.uf || '',
       postalCode: enderecoGeral.cep || '',
       country: 'BR',
-      complement: enderecoGeral.complemento || '',
+      complement: enderecoGeral.complemento || 'sem complemento',
       reference: '',
       latitude: coords?.latitude || -23.55052,
       longitude: coords?.longitude || -46.63331,
@@ -69,7 +70,7 @@ async function transformarPedidoParaOpenDelivery(pedido) {
       longitude: -46.63,
       pickupLocation: 'Recepção',
       parkingSpace: true,
-      instructions: 'Entrada lateral'
+      instructions: ''
     },
 
     notifyPickup: true,
@@ -81,7 +82,7 @@ async function transformarPedidoParaOpenDelivery(pedido) {
       type: ['MOTORBIKE_BAG'],
       container: 'NORMAL',
       containerSize: 'SMALL',
-      instruction: 'Cuidado com o frágil'
+      instruction: ''
     },
 
     limitTimes: {
@@ -95,7 +96,10 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     totalWeight: 1,
     packageVolume: 1,
     packageQuantity: 1,
-    specialInstructions: 'Manter na vertical',
+    items: [
+      pedido.itens.descricao
+    ],
+    specialInstructions: '',
 
     payments: {
       method: 'OFFLINE',
