@@ -32,7 +32,7 @@ async function transformarPedidoParaOpenDelivery(pedido) {
 
     customer: {
       name: contato.nome || 'Sem nome',
-      phone: contato.celular || '+550000000000'
+      phone: contato.customerPhoneLocalizer || '+550000000000'
     },
 
     items: (pedido.itens || []).map(item => ({
@@ -96,9 +96,11 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     totalWeight: 1,
     packageVolume: 1,
     packageQuantity: 1,
-    items: [
-      pedido.itens.descricao
-    ],
+    items: (pedido.itens || []).map(item => ({
+      name: item.descricao || 'Produto',
+      quantity: item.quantidade || 1,
+      price: item.valor || 0
+    })),
     specialInstructions: '',
 
     payments: {
