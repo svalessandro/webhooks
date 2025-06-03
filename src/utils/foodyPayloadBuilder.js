@@ -97,7 +97,12 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     totalWeight: 1,
     packageVolume: 1,
     packageQuantity: 1,
-    specialInstructions: '',
+    specialInstructions: (pedido.itens || [])
+      .map(wrapper => {
+        const item = wrapper.item || wrapper;
+        return `${item.quantidade || 1}x ${item.descricao || 'Produto'} - R$ ${item.valor?.toFixed(2) || '0,00'}`;
+      })
+      .join(' | '),
 
     payments: {
       method: 'OFFLINE',
