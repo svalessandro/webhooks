@@ -22,7 +22,7 @@ async function consultarContatoBling(contatoId) {
   const token = await getBlingAccessToken();
 
   const response = await axios.get(
-    `${BLING_API_URL}/contatos/${contatoId}`,
+    `${BLING_API_BASE_URL}/contatos/${contatoId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`
