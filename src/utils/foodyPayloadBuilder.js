@@ -1,15 +1,28 @@
 const { obterCoordenadasPorEndereco } = require('../utils/geocodificador');
+const { obterContatoBling } = require('../services/blingService'); // ou o nome do arquivo onde está a função
 
 async function transformarPedidoParaOpenDelivery(pedido) {
-  const enderecoEntrega = pedido.transporte?.etiqueta;
-  const enderecoTexto = `${enderecoEntrega?.endereco || ''}, ${enderecoEntrega?.numero || ''}, ${enderecoEntrega?.municipio || ''} - ${enderecoEntrega?.uf || ''}, ${enderecoEntrega?.cep || ''}`;
+  const contatoId = pedido.contato?.id;
 
+  if (!contatoId) {
+    throw new Error('ID do contato não encontrado no pedido.');
+  }
+
+  const contatoResponse = await obterContatoBling(contatoId);
+  const contato = contatoResponse?.data;
+
+  const enderecoGeral = contato?.endereco?.geral;
+  if (!enderecoGeral) {
+    throw new Error('Endereço geral não encontrado para o contato.');
+  }
+
+  const enderecoTexto = `${enderecoGeral.endereco || ''}, ${enderecoGeral.numero || ''}, ${enderecoGeral.municipio || ''} - ${enderecoGeral.uf || ''}, ${enderecoGeral.cep || ''}`;
   const coords = await obterCoordenadasPorEndereco(enderecoTexto);
 
   return {
     orderId: pedido.id.toString(),
     orderDisplayId: pedido.numero.toString(),
-    customerName: pedido.contato?.nome || 'Nome não informado', // ✅ aqui!
+    customerName: contato.nome || 'Nome não informado',
 
     merchant: {
       id: "00000000000000-teste",
@@ -17,8 +30,8 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     },
 
     customer: {
-      name: pedido.contato?.nome || 'Sem nome',
-      phone: '+550000000000'
+      name: contato.nome || 'Sem nome',
+      phone: contato.celular || '+550000000000'
     },
 
     items: (pedido.itens || []).map(item => ({
@@ -28,19 +41,20 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     })),
 
     deliveryAddress: {
-      street: enderecoEntrega?.endereco || '',
-      number: enderecoEntrega?.numero || '',
-      district: enderecoEntrega?.bairro || '',
-      city: enderecoEntrega?.municipio || '',
-      state: enderecoEntrega?.uf || '',
-      postalCode: enderecoEntrega?.cep || '',
+      street: enderecoGeral.endereco || '',
+      number: enderecoGeral.numero || '',
+      district: enderecoGeral.bairro || '',
+      city: enderecoGeral.municipio || '',
+      state: enderecoGeral.uf || '',
+      postalCode: enderecoGeral.cep || '',
       country: 'BR',
-      complement: enderecoEntrega?.complemento || '',
+      complement: enderecoGeral.complemento || '',
       reference: '',
       latitude: coords?.latitude || -23.55052,
       longitude: coords?.longitude || -46.63331,
       instructions: ''
     },
+
     pickupAddress: {
       country: 'BR',
       state: 'SP',
@@ -57,27 +71,32 @@ async function transformarPedidoParaOpenDelivery(pedido) {
       parkingSpace: true,
       instructions: 'Entrada lateral'
     },
+
     notifyPickup: true,
     notifyConclusion: true,
     returnToMerchant: true,
     canCombine: true,
+
     vehicle: {
       type: ['MOTORBIKE_BAG'],
       container: 'NORMAL',
       containerSize: 'SMALL',
       instruction: 'Cuidado com o frágil'
     },
+
     limitTimes: {
       pickupLimit: 30,
       deliveryLimit: 60,
       orderCreatedAt: new Date().toISOString()
     },
+
     totalOrderPrice: { value: pedido.total, currency: 'BRL' },
     orderDeliveryFee: { value: 10, currency: 'BRL' },
     totalWeight: 1,
     packageVolume: 1,
     packageQuantity: 1,
     specialInstructions: 'Manter na vertical',
+
     payments: {
       method: 'OFFLINE',
       wirelessPos: true,
@@ -89,8 +108,9 @@ async function transformarPedidoParaOpenDelivery(pedido) {
       ],
       change: { value: 0, currency: 'BRL' }
     },
+
     combinedOrdersIds: []
   };
-};
+}
 
 module.exports = { transformarPedidoParaOpenDelivery };

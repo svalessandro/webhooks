@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { consultarPedidoBling } = require('../services/blingApiService');
 const { enviarPedidoFoody } = require('../services/foodyService');
-const { transformarPedidoParaOpenDelivery } = require('../utils/foodyPayloadBuilder'); // Certifique-se de que o caminho está correto
+const { transformarPedidoParaOpenDelivery } = require('../utils/foodyPayloadBuilder');
 
 router.post('/bling', async (req, res) => {
   const pedidoBling = req.body.data;
@@ -16,7 +16,7 @@ router.post('/bling', async (req, res) => {
   }
 
   try {
-    // Consulta detalhada no Bling
+    // Consulta os dados detalhados do pedido
     const pedidoDetalhado = await consultarPedidoBling(pedidoBling.id, pedidoBling.numero);
     const pedido = pedidoDetalhado?.data;
 
@@ -24,13 +24,11 @@ router.post('/bling', async (req, res) => {
       throw new Error('Pedido retornado do Bling está incompleto.');
     }
 
-    // Transforma o pedido para o formato do Foody
-    const payloadFoody = await transformarPedidoParaOpenDelivery(pedido); // ❗ agora com await
+    // Transforma o pedido para o formato exigido pela Foody
+    const payloadFoody = await transformarPedidoParaOpenDelivery(pedido);
+
+    // Envia o pedido para a Foody
     console.log('🚀 Enviando pedido para Foody Open Delivery:', payloadFoody);
-    await enviarPedidoFoody(payloadFoody);
-
-
-    // Envia para a Foody
     await enviarPedidoFoody(payloadFoody);
 
     console.log('✅ Pedido processado com sucesso!');

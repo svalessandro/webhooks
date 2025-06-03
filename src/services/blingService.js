@@ -1,4 +1,4 @@
-const axios = require('axios');
+/** const axios = require('axios');
 const { getBlingAccessToken } = require('./blingAuthService');
 
 const BLING_API_URL = process.env.BLING_API_URL;
@@ -34,3 +34,4 @@ async function obterContatoBling(contatoId) {
 }
 
 module.exports = { obterPedidoBling, obterContatoBling };
+*/
