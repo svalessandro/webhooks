@@ -1,5 +1,5 @@
 const { obterCoordenadasPorEndereco } = require('../utils/geocodificador');
-const { obterContatoBling } = require('../services/blingService'); // ou o nome do arquivo onde está a função
+const { consultarContatoBling } = require('../services/blingApiService'); // ou o nome do arquivo onde está a função
 
 async function transformarPedidoParaOpenDelivery(pedido) {
   const contatoId = pedido.contato?.id;
@@ -8,7 +8,7 @@ async function transformarPedidoParaOpenDelivery(pedido) {
     throw new Error('ID do contato não encontrado no pedido.');
   }
 
-  const contatoResponse = await obterContatoBling(contatoId);
+  const contatoResponse = await consultarContatoBling(contatoId);
   const contato = contatoResponse?.data;
 
   const enderecoGeral = contato?.endereco?.geral;
