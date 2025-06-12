@@ -68,4 +68,36 @@ async function getBlingAccessToken() {
   }
 }
 
-module.exports = { getBlingAccessToken };
+async function exchangeAuthorizationCodeForToken(authorizationCode) {
+  console.log('\uD83D\uDD04 Trocando authorization_code por tokens...');
+  try {
+    const response = await axios.post(
+      BLING_TOKEN_URL,
+      new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: authorizationCode
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ' + Buffer.from(`${BLING_CLIENT_ID}:${BLING_CLIENT_SECRET}`).toString('base64')
+        }
+      }
+    );
+
+    const now = Date.now();
+    tokens.access_token = response.data.access_token;
+    tokens.refresh_token = response.data.refresh_token;
+    const expiresIn = response.data.expires_in || 3600;
+    tokens.expires_at = now + expiresIn * 1000;
+
+    fs.writeFileSync(tokensPath, JSON.stringify(tokens, null, 2));
+    console.log('\u2705 Tokens atualizados e salvos com sucesso.');
+    return tokens;
+  } catch (error) {
+    console.error('\u274C Erro ao trocar authorization_code:', error.response?.data || error.message);
+    throw new Error('Falha ao trocar authorization_code por tokens');
+  }
+}
+
+module.exports = { getBlingAccessToken, exchangeAuthorizationCodeForToken };
