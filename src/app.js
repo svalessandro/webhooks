@@ -19,6 +19,9 @@ app.use('/webhook', blingWebhook);
 // Rota para receber webhooks da Foody
 app.use('/webhook/foody', foodyWebhook);
 
+// Rota para receber webhooks da Foody
+app.use('/webhook/foody', foodyWebhook);
+
 // Rota de callback do Bling para troca de authorization_code automaticamente
 app.get('/oauth/callback', async (req, res) => {
   const { code, state } = req.query;
