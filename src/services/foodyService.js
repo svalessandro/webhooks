@@ -31,4 +31,31 @@ async function enviarPedidoFoody(payload) {
   }
 }
 
-module.exports = { enviarPedidoFoody };
+async function atualizarStatusPedidoFoody(orderId, status) {
+  const token = await getAccessToken();
+
+  try {
+    const response = await axios.put(
+      `${FOODY_URL}/logistics/delivery/${orderId}/status`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log('✅ Status do pedido atualizado:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Erro ao atualizar status do pedido:', {
+      status: error.response?.status,
+      headers: error.response?.headers,
+      data: error.response?.data,
+      message: error.message
+    });
+  }
+}
+
+module.exports = { enviarPedidoFoody, atualizarStatusPedidoFoody };

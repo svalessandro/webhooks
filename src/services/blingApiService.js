@@ -33,4 +33,21 @@ async function consultarContatoBling(contatoId) {
   return response.data;
 }
 
-module.exports = { consultarPedidoBling, consultarContatoBling };
+async function atualizarStatusPedidoBling(pedidoId, status) {
+  const token = await getBlingAccessToken();
+
+  const response = await axios.post(
+    `${BLING_API_BASE_URL}/pedidos/vendas/${pedidoId}/situacoes`,
+    { situacao: status },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+
+  return response.data;
+}
+
+module.exports = { consultarPedidoBling, consultarContatoBling, atualizarStatusPedidoBling };
