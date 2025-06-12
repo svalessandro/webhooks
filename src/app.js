@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const blingWebhook = require('./routes/blingWebhook');
+const foodyWebhook = require('./routes/foodyWebhook');
 const { exchangeAuthorizationCodeForToken } = require('./services/blingAuthService');
 
 dotenv.config();
@@ -15,6 +16,9 @@ app.use(bodyParser.json());
 
 // Rota para receber webhooks do Bling
 app.use('/webhook', blingWebhook);
+
+// Rota para receber webhooks da Foody
+app.use('/webhook/foody', foodyWebhook);
 
 // Rota de callback do Bling para troca de authorization_code automaticamente
 app.get('/oauth/callback', async (req, res) => {
