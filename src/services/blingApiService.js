@@ -33,6 +33,10 @@ async function consultarContatoBling(contatoId) {
   return response.data;
 }
 
+ codex/add-atualizarstatuspedidobling-and-atualizarstatuspedidofood
+ codex/add-atualizarstatuspedidobling-and-atualizarstatuspedidofood
+ {
+
 codex/implement-foody-and-bling-webhook-endpoints
 async function atualizarStatusPedidoBling(orderId, status) {
   const token = await getBlingAccessToken();
@@ -65,12 +69,17 @@ module.exports = {
   atualizarStatusPedidoBling
 };
 
+ main
 async function atualizarSituacaoPedidoBling(pedidoId, situacaoId) {
+ main
   const token = await getBlingAccessToken();
 
   const response = await axios.post(
     `${BLING_API_BASE_URL}/pedidos/vendas/${pedidoId}/situacoes`,
+ codex/add-atualizarstatuspedidobling-and-atualizarstatuspedidofood
+    { situacao: status },
     { idSituacao: situacaoId },
+ main
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -82,5 +91,11 @@ async function atualizarSituacaoPedidoBling(pedidoId, situacaoId) {
   return response.data;
 }
 
+ codex/add-atualizarstatuspedidobling-and-atualizarstatuspedidofood
+ codex/add-atualizarstatuspedidobling-and-atualizarstatuspedidofood
+module.exports = { consultarPedidoBling, consultarContatoBling, atualizarStatusPedidoBling };
+
+
 module.exports = { consultarPedidoBling, consultarContatoBling, atualizarSituacaoPedidoBling };
+ main
 main
