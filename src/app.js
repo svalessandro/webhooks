@@ -16,6 +16,8 @@ app.use(bodyParser.json());
 
 // Rota para receber webhooks do Bling
 app.use('/webhook', blingWebhook);
+// Rota para receber webhooks da Foody
+app.use('/webhook/foody', foodyWebhook);
 
 // Rota para receber webhooks da Foody
 app.use('/webhook/foody', foodyWebhook);
