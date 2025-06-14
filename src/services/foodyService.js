@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { getAccessToken } = require('./authService');
+const { salvarRelacionamentoFoody } = require('./foodyBlingMap');
 
 const FOODY_URL = process.env.FOODY_OPEN_DELIVERY_URL;
 
@@ -19,6 +20,12 @@ async function enviarPedidoFoody(payload) {
         }
       }
     );
+
+    const deliveryId = response.data?.deliveryId;
+    if (deliveryId) {
+      salvarRelacionamentoFoody(deliveryId, payload.orderId);
+      console.log(`🧩 Mapeamento salvo: ${deliveryId} -> ${payload.orderId}`);
+    }
 
     console.log('✅ Pedido enviado com sucesso:', response.data);
   } catch (error) {
