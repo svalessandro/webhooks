@@ -4,11 +4,11 @@ const BLING_API_URL = 'https://api.bling.com.br/Api/v3';
 const getBlingAccessToken = require('./blingAuthService'); // deve retornar access_token válido
 
 const statusMap = {
-  OPEN: 6,
+  open: 6,
   onGoing: 15,
-  Delivered: 9,
-  Closed: 9,
-  CANCELLED: 12
+  delivered: 9,
+  closed: 9,
+  cancelled: 12
 };
 
 async function atualizarStatusPedidoBling(idPedidoVenda, statusFoody) {
