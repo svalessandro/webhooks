@@ -1,8 +1,7 @@
 const axios = require('axios');
-
-const BLING_API_URL = 'https://api.bling.com.br/Api/v3';
 const { getBlingAccessToken } = require('./blingAuthService');
 
+const BLING_API_URL = 'https://api.bling.com.br/Api/v3';
 
 const statusMap = {
   open: 6,
@@ -23,9 +22,11 @@ async function atualizarStatusPedidoBling(idPedidoVenda, statusFoody) {
 
   try {
     const url = `${BLING_API_URL}/pedidos/vendas/${idPedidoVenda}/situacoes/${idSituacao}`;
-    const response = await axios.post(
+    console.log(`🔁 Atualizando pedido ${idPedidoVenda} para situação ${idSituacao} no Bling`);
+
+    const response = await axios.patch(
       url,
-      {},
+      null,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -34,9 +35,9 @@ async function atualizarStatusPedidoBling(idPedidoVenda, statusFoody) {
       }
     );
 
-    console.log(`✅ Status do pedido ${idPedidoVenda} atualizado para situação ${idSituacao} no Bling`);
+    console.log(`✅ Status do pedido ${idPedidoVenda} atualizado com sucesso para ${idSituacao}`);
   } catch (error) {
-    console.error(`❌ Erro ao atualizar status no Bling:`, error.response?.data || error.message);
+    console.error('❌ Erro ao atualizar status no Bling:', error.response?.data || error.message);
   }
 }
 
