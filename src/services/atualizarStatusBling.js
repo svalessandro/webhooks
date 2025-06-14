@@ -5,6 +5,7 @@ const BLING_API_URL = 'https://api.bling.com.br/Api/v3';
 
 const statusMap = {
   open: 6,
+  accepted: 464346,
   onGoing: 15,
   delivered: 9,
   closed: 9,
