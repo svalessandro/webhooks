@@ -1,7 +1,8 @@
 const axios = require('axios');
 
 const BLING_API_URL = 'https://api.bling.com.br/Api/v3';
-const getBlingAccessToken = require('./blingAuthService'); // deve retornar access_token válido
+const { getBlingAccessToken } = require('./blingAuthService');
+
 
 const statusMap = {
   open: 6,
