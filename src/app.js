@@ -4,13 +4,22 @@ const dotenv = require('dotenv');
 const blingWebhook = require('./routes/blingWebhook');
 const foodyWebhook = require('./routes/foodyWebhook'); // ✅ Importa o webhook do Foody
 const { exchangeAuthorizationCodeForToken } = require('./services/blingAuthService');
+const logger = require('./logger');
 
 dotenv.config();
 
-console.log('✅ FOODY_URL:', process.env.FOODY_OPEN_DELIVERY_URL);
+logger.info({ FOODY_URL: process.env.FOODY_OPEN_DELIVERY_URL }, 'FOODY_URL carregada');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'bling-foody-integration',
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.use(bodyParser.json());
 
@@ -28,16 +37,28 @@ app.get('/oauth/callback', async (req, res) => {
     return res.status(400).send('❌ Authorization code não encontrado.');
   }
 
-  console.log('🔑 Recebido authorization_code:', code);
+  logger.info({ code }, 'Authorization code recebido do Bling');
+
   try {
     const tokens = await exchangeAuthorizationCodeForToken(code);
+
     res.send(`✅ Tokens obtidos com sucesso: ${JSON.stringify(tokens)}`);
+
   } catch (error) {
-    console.error('❌ Erro ao trocar authorization_code:', error.message);
+
+    logger.error(
+      { message: error.message },
+      'Erro ao trocar authorization_code'
+    );
+
     res.status(500).send('❌ Erro ao trocar authorization_code');
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  logger.info({ port: PORT }, 'Servidor iniciado');
 });
+
+const errorHandler = require('./middlewares/errorHandler');
+
+app.use(errorHandler);

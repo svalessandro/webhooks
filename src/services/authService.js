@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../logger');
 
 const FOODY_CLIENT_ID = process.env.FOODY_CLIENT_ID;
 const FOODY_CLIENT_SECRET = process.env.FOODY_CLIENT_SECRET;
@@ -14,7 +15,7 @@ async function getAccessToken() {
     return accessToken;
   }
 
-  console.log('🔑 Solicitando novo token via OAuth2...');
+  logger.info('Solicitando novo token OAuth2 Foody');
 
   try {
     const response = await axios.post(
@@ -35,12 +36,22 @@ async function getAccessToken() {
     const expiresIn = response.data.expires_in || 3600; // fallback 1 hora
     tokenExpiresAt = now + expiresIn * 1000;
 
-    console.log(`✅ Novo token obtido com sucesso. Expira em ${expiresIn} segundos.`);
+    logger.info(`Novo token Foody obtido. Expira em ${expiresIn}s`);
     return accessToken;
 
   } catch (error) {
-    console.error('❌ Erro ao obter token:', error.response?.data || error.message);
+
+    logger.error(
+      {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      },
+      'Erro ao obter token OAuth2 da Foody'
+    );
+
     throw new Error('Falha ao obter token de autenticação');
+
   }
 }
 

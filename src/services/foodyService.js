@@ -1,15 +1,17 @@
 const axios = require('axios');
 const { getAccessToken } = require('./authService');
 const { salvarRelacionamentoFoody } = require('./foodyBlingMap');
+const logger = require('../logger');
 
 const FOODY_URL = process.env.FOODY_OPEN_DELIVERY_URL;
 
 async function enviarPedidoFoody(payload) {
   const token = await getAccessToken();
 
-  console.log('🚀 Enviando pedido para Foody Open Delivery:', payload);
+  logger.info({ payload }, 'Enviando pedido para Foody Open Delivery');
 
   try {
+
     const response = await axios.post(
       `${FOODY_URL}/logistics/delivery`,
       payload,
@@ -22,19 +24,30 @@ async function enviarPedidoFoody(payload) {
     );
 
     const deliveryId = response.data?.deliveryId;
+
     if (deliveryId) {
       salvarRelacionamentoFoody(deliveryId, payload.orderId);
-      console.log(`🧩 Mapeamento salvo: ${deliveryId} -> ${payload.orderId}`);
+
+      logger.info(
+        { deliveryId, orderId: payload.orderId },
+        'Mapeamento salvo'
+      );
     }
 
-    console.log('✅ Pedido enviado com sucesso:', response.data);
+    logger.info({ response: response.data }, 'Pedido enviado com sucesso');
+
   } catch (error) {
-    console.error('❌ Erro ao processar pedido:', {
-      status: error.response?.status,
-      headers: error.response?.headers,
-      data: error.response?.data,
-      message: error.message
-    });
+
+    logger.error(
+      {
+        status: error.response?.status,
+        headers: error.response?.headers,
+        data: error.response?.data,
+        message: error.message
+      },
+      'Erro ao processar pedido'
+    );
+
   }
 }
 

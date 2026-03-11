@@ -1,10 +1,12 @@
-// src/utils/geocodificador.js
 const axios = require('axios');
+const logger = require('../logger');
 
 async function obterCoordenadasPorEndereco(endereco) {
+
   const url = `https://nominatim.openstreetmap.org/search`;
 
   try {
+
     const response = await axios.get(url, {
       params: {
         q: endereco,
@@ -26,11 +28,17 @@ async function obterCoordenadasPorEndereco(endereco) {
       };
     }
 
-    console.warn('⚠️ Nenhuma coordenada encontrada para o endereço:', endereco);
+    logger.warn({ endereco }, 'Nenhuma coordenada encontrada para o endereço');
+
     return null;
 
   } catch (error) {
-    console.error('❌ Erro ao obter coordenadas:', error.message);
+
+    logger.error(
+      { message: error.message },
+      'Erro ao obter coordenadas'
+    );
+
     return null;
   }
 }

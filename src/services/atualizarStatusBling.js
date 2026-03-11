@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { getBlingAccessToken } = require('./blingAuthService');
+const logger = require('../logger');
 
 const BLING_API_URL = 'https://api.bling.com.br/Api/v3';
 
@@ -15,7 +16,7 @@ const statusMap = {
 async function atualizarStatusPedidoBling(idPedidoVenda, statusFoody) {
   const idSituacao = statusMap[statusFoody];
   if (!idSituacao) {
-    console.warn(`⚠️ Status desconhecido recebido da Foody: ${statusFoody}`);
+    logger.warn(`Status desconhecido recebido da Foody: ${statusFoody}`);
     return;
   }
 
@@ -23,7 +24,7 @@ async function atualizarStatusPedidoBling(idPedidoVenda, statusFoody) {
 
   try {
     const url = `${BLING_API_URL}/pedidos/vendas/${idPedidoVenda}/situacoes/${idSituacao}`;
-    console.log(`🔁 Atualizando pedido ${idPedidoVenda} para situação ${idSituacao} no Bling`);
+    logger.info(`Atualizando pedido ${idPedidoVenda} para situação ${idSituacao} no Bling`);
 
     const response = await axios.patch(
       url,
@@ -36,9 +37,20 @@ async function atualizarStatusPedidoBling(idPedidoVenda, statusFoody) {
       }
     );
 
-    console.log(`✅ Status do pedido ${idPedidoVenda} atualizado com sucesso para ${idSituacao}`);
+    logger.info(`Status do pedido ${idPedidoVenda} atualizado com sucesso`);
   } catch (error) {
-    console.error('❌ Erro ao atualizar status no Bling:', error.response?.data || error.message);
+
+    logger.error(
+      {
+        idPedidoVenda,
+        statusFoody,
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      },
+      'Erro ao atualizar status do pedido no Bling'
+    );
+
   }
 }
 
