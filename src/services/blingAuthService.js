@@ -25,6 +25,17 @@ if (fs.existsSync(tokensPath)) {
   }
 }
 
+function basicAuthHeader() {
+  return (
+    'Basic ' +
+    Buffer.from(`${BLING_CLIENT_ID}:${BLING_CLIENT_SECRET}`).toString('base64')
+  );
+}
+
+function salvarTokens() {
+  fs.writeFileSync(tokensPath, JSON.stringify(tokens, null, 2));
+}
+
 async function getBlingAccessToken() {
 
   const now = Date.now();
@@ -51,9 +62,7 @@ async function getBlingAccessToken() {
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization:
-            'Basic ' +
-            Buffer.from(`${BLING_CLIENT_ID}:${BLING_CLIENT_SECRET}`).toString('base64')
+          Authorization: basicAuthHeader()
         }
       }
     );
@@ -71,7 +80,7 @@ async function getBlingAccessToken() {
     }
 
     // Salva tokens no arquivo
-    fs.writeFileSync(tokensPath, JSON.stringify(tokens, null, 2));
+    salvarTokens();
 
     logger.info(
       { expiresIn },
@@ -95,4 +104,52 @@ async function getBlingAccessToken() {
   }
 }
 
-module.exports = { getBlingAccessToken };
+// Troca o authorization_code (callback OAuth2) por tokens e salva no servidor.
+// Os tokens não são devolvidos ao chamador nem registrados no log.
+async function exchangeAuthorizationCodeForToken(code) {
+
+  logger.info('Trocando authorization_code por tokens do Bling');
+
+  try {
+
+    const response = await axios.post(
+      BLING_TOKEN_URL,
+      new URLSearchParams({
+        grant_type: 'authorization_code',
+        code
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: basicAuthHeader()
+        }
+      }
+    );
+
+    const expiresIn = response.data.expires_in || 3600;
+
+    tokens = {
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
+      expires_at: Date.now() + expiresIn * 1000
+    };
+
+    salvarTokens();
+
+    logger.info({ expiresIn }, 'Tokens do Bling obtidos e salvos');
+
+  } catch (error) {
+
+    logger.error(
+      {
+        status: error.response?.status,
+        message: error.message
+      },
+      'Erro ao trocar authorization_code'
+    );
+
+    throw new Error('Falha ao trocar authorization_code');
+  }
+}
+
+module.exports = { getBlingAccessToken, exchangeAuthorizationCodeForToken };
