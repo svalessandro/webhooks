@@ -1,3 +1,5 @@
 node_modules/
 .env
 bling_tokens.json
+foody_bling_map.json
+.DS_Store
