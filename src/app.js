@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const blingWebhook = require('./routes/blingWebhook');
-const foodyWebhook = require('./routes/foodyWebhook'); // ✅ Importa o webhook do Foody
+const foodyWebhook = require('./routes/foodyWebhook');
 const { exchangeAuthorizationCodeForToken } = require('./services/blingAuthService');
 const logger = require('./logger');
 
@@ -23,26 +23,27 @@ app.get('/health', (req, res) => {
 
 app.use(bodyParser.json());
 
-// ✅ Rota do webhook do Foody
+// Rota do webhook do Foody
 app.use('/webhook/foody', foodyWebhook);
 
 // Rota para webhooks do Bling
 app.use('/webhook', blingWebhook);
 
-// Rota de callback do Bling
+// Rota de callback do Bling.
+// Os tokens são salvos no servidor e nunca devolvidos na resposta nem registrados no log.
 app.get('/oauth/callback', async (req, res) => {
-  const { code, state } = req.query;
+  const { code } = req.query;
 
   if (!code) {
-    return res.status(400).send('❌ Authorization code não encontrado.');
+    return res.status(400).send('Authorization code não encontrado.');
   }
 
-  logger.info({ code }, 'Authorization code recebido do Bling');
+  logger.info('Authorization code recebido do Bling');
 
   try {
-    const tokens = await exchangeAuthorizationCodeForToken(code);
+    await exchangeAuthorizationCodeForToken(code);
 
-    res.send(`✅ Tokens obtidos com sucesso: ${JSON.stringify(tokens)}`);
+    res.send('Autorização concluída. Os tokens foram salvos no servidor.');
 
   } catch (error) {
 
@@ -51,14 +52,14 @@ app.get('/oauth/callback', async (req, res) => {
       'Erro ao trocar authorization_code'
     );
 
-    res.status(500).send('❌ Erro ao trocar authorization_code');
+    res.status(500).send('Erro ao trocar authorization_code');
   }
-});
-
-app.listen(PORT, () => {
-  logger.info({ port: PORT }, 'Servidor iniciado');
 });
 
 const errorHandler = require('./middlewares/errorHandler');
 
 app.use(errorHandler);
+
+app.listen(PORT, () => {
+  logger.info({ port: PORT }, 'Servidor iniciado');
+});
